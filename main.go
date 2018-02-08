@@ -12,6 +12,7 @@ import (
 var (
 	flagA bool
 	flagH bool
+	flagI bool
 	flagV bool
 )
 
@@ -29,6 +30,8 @@ func main() {
 	f := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	f.BoolVar(&flagA, "all", false, "display all matched lines")
 	f.BoolVar(&flagA, "a", false, "display all matched lines")
+	f.BoolVar(&flagI, "inner", false, "display the inner part of matched lines")
+	f.BoolVar(&flagI, "i", false, "display the inner part of matched lines")
 	f.BoolVar(&flagH, "help", false, "show help")
 	f.BoolVar(&flagH, "h", false, "show help")
 	f.BoolVar(&flagV, "version", false, "print the version")
@@ -56,14 +59,14 @@ func (c *CLI) Run(args []string) int {
 		return 0
 	}
 
-	ss := []io.Reader{}
+	rs := []io.Reader{}
 
 	switch len(args) {
 	case 0, 1:
 		fmt.Fprintln(c.errStream, "between: too few arguments")
 		return 1
 	case 2:
-		ss = append(ss, c.inStream)
+		rs = append(rs, c.inStream)
 	default:
 		for _, a := range args[2:] {
 			f, err := os.Open(a)
@@ -73,7 +76,7 @@ func (c *CLI) Run(args []string) int {
 			}
 			defer f.Close()
 
-			ss = append(ss, f)
+			rs = append(rs, f)
 		}
 	}
 
@@ -88,31 +91,36 @@ func (c *CLI) Run(args []string) int {
 		return 1
 	}
 
-	for _, s := range ss {
-		s := bufio.NewScanner(s)
+	for _, r := range rs {
+		s := bufio.NewScanner(r)
 		ok := false
-		cnt := 0
+
+	L:
 		for s.Scan() {
 			text := s.Text()
 
-			if !ok && r1.MatchString(text) {
+			switch {
+			case !ok && r1.MatchString(text):
 				ok = true
-				cnt++
-			}
-
-			if ok {
-				if cnt == 1 || flagA {
+				if !flagI {
 					fmt.Fprintln(c.outStream, text)
 				}
-			}
 
-			if ok && r2.MatchString(text) {
+			case ok && r2.MatchString(text):
 				ok = false
+				if !flagI {
+					fmt.Fprintln(c.outStream, text)
+				}
+				if !flagA {
+					break L
+				}
+
+			case ok:
+				fmt.Fprintln(c.outStream, text)
+
 			}
 		}
-
 	}
-
 	return 0
 }
 
