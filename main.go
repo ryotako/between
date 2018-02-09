@@ -129,7 +129,7 @@ func (c *CLI) Usage() {
    between - display from the matched line to the matched line
 
 USAGE:
-   between [options] cond1 cond2 [files...]
+   between [options] regexp1 regexp2 [files...]
 
 VERSION:
    %s
