@@ -136,7 +136,7 @@ VERSION:
 
 OPTIONS:
    -a, --all      display all matched lines
-	 -i, --inner    display the inner part of matched lines
+   -i, --inner    display the inner part of matched lines
    -h, --help     show help
    -v, --version  print the version
 `, VERSION)
