@@ -27,6 +27,17 @@ type CLI struct {
 
 func main() {
 
+	c := &CLI{
+		inStream:  os.Stdin,
+		outStream: os.Stdout,
+		errStream: os.Stderr,
+	}
+
+	os.Exit(c.Run(os.Args[1:]))
+}
+
+func (c *CLI) Run(args []string) int {
+
 	f := flag.NewFlagSet(os.Args[0], flag.ExitOnError)
 	f.BoolVar(&flagA, "all", false, "display all matched lines")
 	f.BoolVar(&flagA, "a", false, "display all matched lines")
@@ -37,18 +48,10 @@ func main() {
 	f.BoolVar(&flagV, "version", false, "print the version")
 	f.BoolVar(&flagV, "v", false, "print the version")
 
-	f.Parse(os.Args[1:])
+	f.Parse(args)
 
-	c := &CLI{
-		inStream:  os.Stdin,
-		outStream: os.Stdout,
-		errStream: os.Stderr,
-	}
+	args = f.Args()
 
-	os.Exit(c.Run(f.Args()))
-}
-
-func (c *CLI) Run(args []string) int {
 	if flagH {
 		c.Usage()
 		return 0

@@ -17,6 +17,7 @@ func TestRun(t *testing.T) {
 	}{
 		{stdin: seq(5), input: "2 4", want: "2\n3\n4\n", err: false},
 		{stdin: seq(20), input: "2$ 3$", want: "2\n3\n", err: false},
+		{stdin: seq(20), input: "-a 2$ 3$", want: "2\n3\n12\n13\n", err: false},
 	}
 
 	for _, test := range tests {
