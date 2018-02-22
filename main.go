@@ -104,7 +104,9 @@ func (c *CLI) Run(args []string) int {
 
 			switch {
 			case !ok && r1.MatchString(text):
-				ok = true
+				if !r2.MatchString(text) { // seq 5 | between 2 2 #=> 2
+					ok = true
+				}
 				if !flagI {
 					fmt.Fprintln(c.outStream, text)
 				}
@@ -120,7 +122,6 @@ func (c *CLI) Run(args []string) int {
 
 			case ok:
 				fmt.Fprintln(c.outStream, text)
-
 			}
 		}
 	}
